@@ -76,6 +76,21 @@ export default function AgentsPage() {
     }
   };
 
+  const handleStart = (agent: AgentSummary) => {
+    if (!agent.enabled) {
+      message.warning(t("agent.cannotSwitchToDisabled"));
+      return;
+    }
+
+    const basePath = window.location.pathname.startsWith("/console")
+      ? "/console"
+      : "";
+    const targetUrl = `${basePath}/chat?agentId=${encodeURIComponent(
+      agent.id,
+    )}`;
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
+  };
+
   const handleInstalledSkillsLoaded = (skills: string[]) => {
     installedSkillsRef.current = skills;
   };
@@ -164,6 +179,7 @@ export default function AgentsPage() {
           loading={loading || reordering}
           reordering={reordering}
           onEdit={handleEdit}
+          onStart={handleStart}
           onDelete={handleDelete}
           onToggle={handleToggle}
           onReorder={handleReorder}

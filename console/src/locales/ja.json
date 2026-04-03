@@ -101,7 +101,8 @@
     "currentAgentDeleted": "現在のエージェントが削除されました。デフォルトエージェントに自動切り替えしました",
     "currentAgentDisabled": "現在のエージェントが無効化されました。デフォルトエージェントに自動切り替えしました",
     "switchedToDefault": "デフォルトエージェントに自動切り替えしました",
-    "cannotSwitchToDisabled": "このエージェントは無効化されています。管理ページで有効化してください"
+    "cannotSwitchToDisabled": "このエージェントは無効化されています。管理ページで有効化してください",
+    "start": "開始"
   },
   "workspace": {
     "title": "ファイル",

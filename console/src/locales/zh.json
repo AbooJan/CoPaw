@@ -134,7 +134,8 @@
     "selectBuiltin": "内置",
     "selectNone": "清空",
     "noPoolSkills": "技能池中暂无可用技能",
-    "addSkillsToAgent": "添加技能"
+    "addSkillsToAgent": "添加技能",
+    "start": "开始"
   },
   "skills": {
     "title": "技能",

@@ -23,7 +23,7 @@ export default function LoginPage() {
       .getStatus()
       .then((res) => {
         if (!res.enabled) {
-          navigate("/chat", { replace: true });
+          navigate("/agents", { replace: true });
           return;
         }
         setHasUsers(res.has_users);
@@ -37,9 +37,9 @@ export default function LoginPage() {
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
     try {
-      const raw = searchParams.get("redirect") || "/chat";
+      const raw = searchParams.get("redirect") || "/agents";
       const redirect =
-        raw.startsWith("/") && !raw.startsWith("//") ? raw : "/chat";
+        raw.startsWith("/") && !raw.startsWith("//") ? raw : "/agents";
 
       if (isRegister) {
         const res = await authApi.register(values.username, values.password);

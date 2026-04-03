@@ -47,7 +47,7 @@ const pathToKey: Record<string, string> = {
 export default function MainLayout() {
   const location = useLocation();
   const currentPath = location.pathname;
-  const selectedKey = pathToKey[currentPath] || "chat";
+  const selectedKey = pathToKey[currentPath] || "agents";
 
   return (
     <Layout className={styles.mainLayout}>
@@ -58,7 +58,7 @@ export default function MainLayout() {
           <ConsoleCronBubble />
           <div className="page-content">
             <Routes>
-              <Route path="/" element={<Navigate to="/chat" replace />} />
+              <Route path="/" element={<Navigate to="/agents" replace />} />
               <Route path="/chat/*" element={<Chat />} />
               <Route path="/channels" element={<ChannelsPage />} />
               <Route path="/sessions" element={<SessionsPage />} />

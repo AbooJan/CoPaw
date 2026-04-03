@@ -169,7 +169,8 @@
     "selectBuiltin": "Builtin",
     "selectNone": "None",
     "noPoolSkills": "No skills available in pool",
-    "addSkillsToAgent": "Add Skills"
+    "addSkillsToAgent": "Add Skills",
+    "start": "Start"
   },
   "skills": {
     "title": "Skills",

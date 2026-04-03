@@ -13,7 +13,12 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { EditOutlined, DeleteOutlined, RobotOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  RobotOutlined,
+  PlayCircleOutlined,
+} from "@ant-design/icons";
 import { EyeOff, Eye } from "lucide-react";
 import type { AgentSummary } from "../../../../api/types/agents";
 import { useTheme } from "../../../../contexts/ThemeContext";
@@ -26,6 +31,7 @@ interface AgentTableProps {
   loading: boolean;
   reordering: boolean;
   onEdit: (agent: AgentSummary) => void;
+  onStart: (agent: AgentSummary) => void;
   onDelete: (agentId: string) => void;
   onToggle: (agentId: string, currentEnabled: boolean) => void;
   onReorder: (activeId: string, overId: string) => void;
@@ -36,6 +42,7 @@ export function AgentTable({
   loading,
   reordering,
   onEdit,
+  onStart,
   onDelete,
   onToggle,
   onReorder,
@@ -123,6 +130,16 @@ export function AgentTable({
       key: "actions",
       render: (_: any, record: AgentSummary) => (
         <Space>
+          <Button
+            type="primary"
+            size="small"
+            icon={<PlayCircleOutlined />}
+            onClick={() => onStart(record)}
+            disabled={!record.enabled}
+            title={!record.enabled ? t("agent.cannotSwitchToDisabled") : ""}
+          >
+            {t("agent.start")}
+          </Button>
           <Button
             type="text"
             size="middle"
