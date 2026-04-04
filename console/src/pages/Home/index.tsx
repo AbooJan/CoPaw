@@ -163,15 +163,9 @@ export default function HomePage() {
     <div className={styles.page}>
       <div className={styles.pageInner}>
         <div className={styles.hero}>
-          <div>
-            <Text className={styles.eyebrow}>{t("agent.parent")}</Text>
-            <Title level={2} className={styles.title}>
-              {t("agent.agents")}
-            </Title>
-            <Paragraph className={styles.subtitle}>
-              {t("common.total")}: {agents.length}
-            </Paragraph>
-          </div>
+          <Title level={2} className={styles.title}>
+            {t("agent.agents")}
+          </Title>
         </div>
 
         {loading && agents.length === 0 ? (
