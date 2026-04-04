@@ -13,6 +13,7 @@ import { envApi } from "./modules/env";
 import { providerApi } from "./modules/provider";
 import { skillApi } from "./modules/skill";
 import { agentApi } from "./modules/agent";
+import { agentAvatarApi } from "./modules/agentAvatar";
 import { agentsApi } from "./modules/agents";
 import { workspaceApi } from "./modules/workspace";
 import { localModelApi } from "./modules/localModel";
@@ -50,6 +51,7 @@ export const api = {
 
   // Agent
   ...agentApi,
+  ...agentAvatarApi,
 
   // Skills
   ...skillApi,
@@ -82,3 +84,4 @@ export default api;
 
 // Export individual APIs for direct access
 export { agentsApi };
+export { agentAvatarApi };

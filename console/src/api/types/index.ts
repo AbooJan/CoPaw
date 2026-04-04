@@ -1,4 +1,5 @@
 export * from "./agent";
+export * from "./agentAvatar";
 export * from "./agents";
 export * from "./channel";
 export * from "./heartbeat";

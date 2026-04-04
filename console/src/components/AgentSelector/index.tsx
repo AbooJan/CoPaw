@@ -1,10 +1,12 @@
 import { Select, Tag, Tooltip } from "antd";
 import { useEffect, useState } from "react";
-import { Bot, CheckCircle, EyeOff, ChevronRight } from "lucide-react";
+import { CheckCircle, EyeOff, ChevronRight } from "lucide-react";
 import { SparkDownLine, SparkUpLine } from "@agentscope-ai/icons";
+import { useAgentAvatars } from "../../hooks/useAgentAvatars";
 import { useAgentStore } from "../../stores/agentStore";
 import { agentsApi } from "../../api/modules/agents";
 import { useTranslation } from "react-i18next";
+import { normalizeAgentAvatar } from "../../utils/agentAvatar";
 import { getAgentDisplayName } from "../../utils/agentDisplayName";
 import { useNavigate } from "react-router-dom";
 import { useAppMessage } from "../../hooks/useAppMessage";
@@ -19,6 +21,7 @@ export default function AgentSelector({
 }: AgentSelectorProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { avatars } = useAgentAvatars();
   const { selectedAgent, agents, setSelectedAgent, setAgents } =
     useAgentStore();
   const { message } = useAppMessage();
@@ -96,7 +99,11 @@ export default function AgentSelector({
         overlayInnerStyle={{ background: "rgba(0,0,0,0.75)", color: "#fff" }}
       >
         <div className={styles.agentSelectorCollapsed}>
-          <Bot size={18} strokeWidth={2} />
+          <span className={styles.selectorAvatar}>
+            {normalizeAgentAvatar(
+              currentAgentInfo ? avatars[currentAgentInfo.id] : "",
+            )}
+          </span>
         </div>
       </Tooltip>
     );
@@ -149,7 +156,9 @@ export default function AgentSelector({
             disabled={!agent.enabled}
             label={
               <div className={styles.selectedAgentLabel}>
-                <Bot size={14} strokeWidth={2} />
+                <span className={styles.selectedAgentAvatar}>
+                  {normalizeAgentAvatar(avatars[agent.id])}
+                </span>
                 <span>{getAgentDisplayName(agent, t)}</span>
                 {!agent.enabled && <EyeOff size={12} strokeWidth={2} />}
               </div>
@@ -161,7 +170,9 @@ export default function AgentSelector({
             >
               <div className={styles.agentOptionHeader}>
                 <div className={styles.agentOptionIcon}>
-                  <Bot size={16} strokeWidth={2} />
+                  <span className={styles.optionAvatar}>
+                    {normalizeAgentAvatar(avatars[agent.id])}
+                  </span>
                 </div>
                 <div className={styles.agentOptionContent}>
                   <div className={styles.agentOptionName}>

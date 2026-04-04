@@ -17,29 +17,35 @@ import { useTranslation } from "react-i18next";
 import { agentsApi } from "../../api/modules/agents";
 import { skillApi } from "../../api/modules/skill";
 import type { AgentSummary } from "../../api/types/agents";
+import {
+  notifyAgentAvatarsUpdated,
+  useAgentAvatars,
+} from "../../hooks/useAgentAvatars";
 import { useAppMessage } from "../../hooks/useAppMessage";
+import {
+  DEFAULT_AGENT_AVATAR,
+  normalizeAgentAvatar,
+  shouldPersistAgentAvatar,
+} from "../../utils/agentAvatar";
 import { getAgentDisplayName } from "../../utils/agentDisplayName";
 import { useAgentStore } from "../../stores/agentStore";
 import { AgentModal } from "../Settings/Agents/components";
 import { useAgents } from "../Settings/Agents/useAgents";
+import { agentAvatarApi } from "../../api/modules/agentAvatar";
 import styles from "./index.module.less";
 
 const { Title, Text, Paragraph } = Typography;
-
-function getAgentAvatar(name?: string) {
-  const trimmedName = name?.trim();
-  const match = trimmedName?.match(/^[\u{1F300}-\u{1FAFF}]/u);
-  return match?.[0] || "🤖";
-}
 
 export default function HomePage() {
   const { t } = useTranslation();
   const { message } = useAppMessage();
   const { agents, loading, deleteAgent, loadAgents } = useAgents();
+  const { avatars, loadAvatars } = useAgentAvatars();
   const { selectedAgent, setSelectedAgent } = useAgentStore();
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<AgentSummary | null>(null);
+  const [draftAvatar, setDraftAvatar] = useState(DEFAULT_AGENT_AVATAR);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const installedSkillsRef = useRef<string[]>([]);
 
@@ -50,6 +56,7 @@ export default function HomePage() {
       workspace_dir: "",
     });
     setSelectedSkills([]);
+    setDraftAvatar(DEFAULT_AGENT_AVATAR);
     installedSkillsRef.current = [];
     setModalVisible(true);
   };
@@ -77,6 +84,7 @@ export default function HomePage() {
     try {
       const config = await agentsApi.getAgent(agent.id);
       setEditingAgent(agent);
+      setDraftAvatar(normalizeAgentAvatar(avatars[agent.id]));
       form.setFieldsValue(config);
       setModalVisible(true);
     } catch (error) {
@@ -125,17 +133,26 @@ export default function HomePage() {
         }
 
         await agentsApi.updateAgent(editingAgent.id, payload);
+        if (shouldPersistAgentAvatar(draftAvatar)) {
+          await agentAvatarApi.saveAgentAvatar(editingAgent.id, draftAvatar);
+        } else {
+          await agentAvatarApi.deleteAgentAvatar(editingAgent.id);
+        }
         message.success(t("agent.updateSuccess"));
       } else {
         const result = await agentsApi.createAgent({
           ...payload,
           skill_names: selectedSkills,
         });
+        if (shouldPersistAgentAvatar(draftAvatar)) {
+          await agentAvatarApi.saveAgentAvatar(result.id, draftAvatar);
+        }
         message.success(`${t("agent.createSuccess")} (ID: ${result.id})`);
       }
 
       setModalVisible(false);
-      await loadAgents();
+      await Promise.all([loadAgents(), loadAvatars()]);
+      notifyAgentAvatarsUpdated();
     } catch (error: any) {
       console.error("Failed to save agent:", error);
       message.error(error.message || t("agent.saveFailed"));
@@ -180,7 +197,7 @@ export default function HomePage() {
                 >
                   <div className={styles.cardHeader}>
                     <div className={styles.avatarBadge}>
-                      {getAgentAvatar(agent.name)}
+                      {normalizeAgentAvatar(avatars[agent.id])}
                     </div>
                     {isDisabled && (
                       <span className={styles.statusChip}>
@@ -256,6 +273,7 @@ export default function HomePage() {
                 <PlusOutlined />
               </span>
               <span className={styles.addTitle}>{t("agent.create")}</span>
+              <span className={styles.addHint}>{t("agent.createTitle")}</span>
             </button>
           </div>
         )}
@@ -264,7 +282,9 @@ export default function HomePage() {
           open={modalVisible}
           editingAgent={editingAgent}
           form={form}
+          avatar={draftAvatar}
           selectedSkills={selectedSkills}
+          onAvatarChange={setDraftAvatar}
           onSelectedSkillsChange={setSelectedSkills}
           onInstalledSkillsLoaded={handleInstalledSkillsLoaded}
           onSave={handleSubmit}

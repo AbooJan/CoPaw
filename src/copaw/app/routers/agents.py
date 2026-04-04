@@ -24,6 +24,12 @@ from ...config.utils import load_config, save_config
 from ...agents.memory.agent_md_manager import AgentMdManager
 from ...agents.utils import copy_builtin_qa_md_files
 from ...agents.skills_manager import SkillPoolService, get_workspace_skills_dir
+from ..agent_avatar_store import (
+    AgentAvatarPayload,
+    delete_agent_avatar,
+    list_agent_avatars as load_agent_avatars,
+    save_agent_avatar,
+)
 from ..multi_agent_manager import MultiAgentManager
 from ...constant import WORKING_DIR
 
@@ -52,6 +58,12 @@ class ReorderAgentsRequest(BaseModel):
     """Request model for persisting agent order."""
 
     agent_ids: list[str]
+
+
+class AgentAvatarMapResponse(BaseModel):
+    """Response model for agent emoji avatars."""
+
+    avatars: dict[str, str]
 
 
 class CreateAgentRequest(BaseModel):
@@ -224,6 +236,60 @@ async def reorder_agents(
 
 
 @router.get(
+    "/avatars",
+    response_model=AgentAvatarMapResponse,
+    summary="List local agent avatars",
+    description="Return the local emoji avatar mapping keyed by agent ID",
+)
+async def list_local_agent_avatars() -> AgentAvatarMapResponse:
+    """Return locally stored emoji avatars for configured agents."""
+    config = load_config()
+    valid_agent_ids = set(config.agents.profiles.keys())
+    return AgentAvatarMapResponse(
+        avatars=load_agent_avatars(valid_agent_ids=valid_agent_ids),
+    )
+
+
+@router.put(
+    "/{agentId}/avatar",
+    summary="Save local agent avatar",
+    description="Save one local emoji avatar for the given agent",
+)
+async def put_agent_avatar(
+    agentId: str = PathParam(...),
+    payload: AgentAvatarPayload = Body(...),
+) -> dict:
+    """Save the local emoji avatar for an agent."""
+    config = load_config()
+    if agentId not in config.agents.profiles:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Agent '{agentId}' not found",
+        )
+
+    emoji = save_agent_avatar(agentId, payload.emoji)
+    return {"agent_id": agentId, "emoji": emoji}
+
+
+@router.delete(
+    "/{agentId}/avatar",
+    summary="Delete local agent avatar",
+    description="Delete the local emoji avatar for the given agent",
+)
+async def remove_agent_avatar(agentId: str = PathParam(...)) -> dict:
+    """Delete the local emoji avatar for an agent."""
+    config = load_config()
+    if agentId not in config.agents.profiles:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Agent '{agentId}' not found",
+        )
+
+    delete_agent_avatar(agentId)
+    return {"success": True, "agent_id": agentId}
+
+
+@router.get(
     "/{agentId}",
     response_model=AgentProfileConfig,
     summary="Get agent details",
@@ -378,6 +444,7 @@ async def delete_agent(
     del config.agents.profiles[agentId]
     config.agents.agent_order = _normalized_agent_order(config)
     save_config(config)
+    delete_agent_avatar(agentId)
 
     return {"success": True, "agent_id": agentId}
 

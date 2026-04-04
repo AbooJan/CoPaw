@@ -16,18 +16,19 @@ import {
 import {
   EditOutlined,
   DeleteOutlined,
-  RobotOutlined,
   PlayCircleOutlined,
 } from "@ant-design/icons";
 import { EyeOff, Eye } from "lucide-react";
 import type { AgentSummary } from "../../../../api/types/agents";
 import { useTheme } from "../../../../contexts/ThemeContext";
+import { normalizeAgentAvatar } from "../../../../utils/agentAvatar";
 import { getAgentDisplayName } from "../../../../utils/agentDisplayName";
 import { SortableAgentRow, DragHandle } from "./SortableAgentRow";
 import styles from "../index.module.less";
 
 interface AgentTableProps {
   agents: AgentSummary[];
+  avatars: Record<string, string>;
   loading: boolean;
   reordering: boolean;
   onEdit: (agent: AgentSummary) => void;
@@ -39,6 +40,7 @@ interface AgentTableProps {
 
 export function AgentTable({
   agents,
+  avatars,
   loading,
   reordering,
   onEdit,
@@ -95,12 +97,14 @@ export function AgentTable({
       width: 300,
       render: (_text: string, record: AgentSummary) => (
         <Space>
-          <RobotOutlined
+          <span
             style={{
-              fontSize: 16,
+              fontSize: 18,
               opacity: record.enabled ? 1 : 0.5,
             }}
-          />
+          >
+            {normalizeAgentAvatar(avatars[record.id])}
+          </span>
           <span style={{ opacity: record.enabled ? 1 : 0.5 }}>
             {getAgentDisplayName(record, t)}
           </span>

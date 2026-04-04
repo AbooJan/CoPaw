@@ -5,8 +5,18 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { agentsApi } from "../../../api/modules/agents";
 import { skillApi } from "../../../api/modules/skill";
+import { agentAvatarApi } from "../../../api/modules/agentAvatar";
 import type { AgentSummary } from "../../../api/types/agents";
+import {
+  notifyAgentAvatarsUpdated,
+  useAgentAvatars,
+} from "../../../hooks/useAgentAvatars";
 import { useAgentStore } from "../../../stores/agentStore";
+import {
+  DEFAULT_AGENT_AVATAR,
+  normalizeAgentAvatar,
+  shouldPersistAgentAvatar,
+} from "../../../utils/agentAvatar";
 import { useAgents } from "./useAgents";
 import { AgentTable, AgentModal } from "./components";
 import { PageHeader } from "@/components/PageHeader";
@@ -17,9 +27,11 @@ export default function AgentsPage() {
   const { t } = useTranslation();
   const { agents, loading, deleteAgent, toggleAgent, loadAgents, setAgents } =
     useAgents();
+  const { avatars, loadAvatars } = useAgentAvatars();
   const { selectedAgent, setSelectedAgent } = useAgentStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAgent, setEditingAgent] = useState<AgentSummary | null>(null);
+  const [draftAvatar, setDraftAvatar] = useState(DEFAULT_AGENT_AVATAR);
   const [reordering, setReordering] = useState(false);
   const [form] = Form.useForm();
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -32,6 +44,7 @@ export default function AgentsPage() {
     form.setFieldsValue({
       workspace_dir: "",
     });
+    setDraftAvatar(DEFAULT_AGENT_AVATAR);
     setSelectedSkills([]);
     installedSkillsRef.current = [];
     setModalVisible(true);
@@ -41,6 +54,7 @@ export default function AgentsPage() {
     try {
       const config = await agentsApi.getAgent(agent.id);
       setEditingAgent(agent);
+      setDraftAvatar(normalizeAgentAvatar(avatars[agent.id]));
       form.setFieldsValue(config);
       setModalVisible(true);
     } catch (error) {
@@ -116,17 +130,26 @@ export default function AgentsPage() {
           });
         }
         await agentsApi.updateAgent(editingAgent.id, payload);
+        if (shouldPersistAgentAvatar(draftAvatar)) {
+          await agentAvatarApi.saveAgentAvatar(editingAgent.id, draftAvatar);
+        } else {
+          await agentAvatarApi.deleteAgentAvatar(editingAgent.id);
+        }
         message.success(t("agent.updateSuccess"));
       } else {
         const result = await agentsApi.createAgent({
           ...payload,
           skill_names: selectedSkills,
         });
+        if (shouldPersistAgentAvatar(draftAvatar)) {
+          await agentAvatarApi.saveAgentAvatar(result.id, draftAvatar);
+        }
         message.success(`${t("agent.createSuccess")} (ID: ${result.id})`);
       }
 
       setModalVisible(false);
-      await loadAgents();
+      await Promise.all([loadAgents(), loadAvatars()]);
+      notifyAgentAvatarsUpdated();
     } catch (error: any) {
       console.error("Failed to save agent:", error);
       message.error(error.message || t("agent.saveFailed"));
@@ -176,6 +199,7 @@ export default function AgentsPage() {
       <Card className={styles.tableCard}>
         <AgentTable
           agents={agents}
+          avatars={avatars}
           loading={loading || reordering}
           reordering={reordering}
           onEdit={handleEdit}
@@ -190,7 +214,9 @@ export default function AgentsPage() {
         open={modalVisible}
         editingAgent={editingAgent}
         form={form}
+        avatar={draftAvatar}
         selectedSkills={selectedSkills}
+        onAvatarChange={setDraftAvatar}
         onSelectedSkillsChange={setSelectedSkills}
         onInstalledSkillsLoaded={handleInstalledSkillsLoaded}
         onSave={handleSubmit}

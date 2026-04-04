@@ -13,17 +13,21 @@ import { CheckOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { AgentSummary } from "@/api/types/agents";
 import { getAgentDisplayName } from "@/utils/agentDisplayName";
+import { normalizeAgentAvatar } from "@/utils/agentAvatar";
 import type { PoolSkillSpec } from "@/api/types/skill";
 import { skillApi } from "@/api/modules/skill";
 import styles from "../index.module.less";
 
 const { Text } = Typography;
+const AVATAR_OPTIONS = ["🤖", "🦊", "🐼", "🐙", "🧠", "🚀", "✨", "🛠️"];
 
 interface AgentModalProps {
   open: boolean;
   editingAgent: AgentSummary | null;
   form: ReturnType<typeof Form.useForm>[0];
+  avatar: string;
   selectedSkills: string[];
+  onAvatarChange: (avatar: string) => void;
   onSelectedSkillsChange: (skills: string[]) => void;
   onInstalledSkillsLoaded: (skills: string[]) => void;
   onSave: () => Promise<void>;
@@ -34,7 +38,9 @@ export function AgentModal({
   open,
   editingAgent,
   form,
+  avatar,
   selectedSkills,
+  onAvatarChange,
   onSelectedSkillsChange,
   onInstalledSkillsLoaded,
   onSave,
@@ -118,6 +124,38 @@ export function AgentModal({
       cancelText={t("common.cancel")}
     >
       <Form form={form} layout="vertical" autoComplete="off">
+        <Form.Item
+          label={t("agent.avatar")}
+          extra={t("agent.avatarHelp")}
+        >
+          <div className={styles.avatarField}>
+            <div className={styles.avatarPreview}>
+              {normalizeAgentAvatar(avatar)}
+            </div>
+            <Input
+              value={avatar}
+              maxLength={16}
+              placeholder={t("agent.avatarPlaceholder")}
+              onChange={(event) => onAvatarChange(event.target.value)}
+            />
+          </div>
+          <div className={styles.avatarSuggestions}>
+            {AVATAR_OPTIONS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                className={`${styles.avatarOption} ${
+                  normalizeAgentAvatar(avatar) === option
+                    ? styles.avatarOptionActive
+                    : ""
+                }`}
+                onClick={() => onAvatarChange(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </Form.Item>
         {editingAgent && (
           <Form.Item name="id" label={t("agent.id")}>
             <Input disabled />
