@@ -1,46 +1,58 @@
-import { useEffect, useState } from "react";
-import { Button, Card, Space, Table, Tag, Typography } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { PlayCircleOutlined, RobotOutlined } from "@ant-design/icons";
+import { useRef, useState } from "react";
+import {
+  Button,
+  Empty,
+  Form,
+  Popconfirm,
+  Spin,
+  Typography,
+} from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  PlayCircleOutlined,
+} from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { agentsApi } from "../../api/modules/agents";
+import { skillApi } from "../../api/modules/skill";
 import type { AgentSummary } from "../../api/types/agents";
 import { useAppMessage } from "../../hooks/useAppMessage";
 import { getAgentDisplayName } from "../../utils/agentDisplayName";
+import { useAgentStore } from "../../stores/agentStore";
+import { AgentModal } from "../Settings/Agents/components";
+import { useAgents } from "../Settings/Agents/useAgents";
 import styles from "./index.module.less";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
+
+function getAgentAvatar(name?: string) {
+  const trimmedName = name?.trim();
+  const match = trimmedName?.match(/^[\u{1F300}-\u{1FAFF}]/u);
+  return match?.[0] || "🤖";
+}
 
 export default function HomePage() {
   const { t } = useTranslation();
   const { message } = useAppMessage();
-  const [loading, setLoading] = useState(false);
-  const [agents, setAgents] = useState<AgentSummary[]>([]);
+  const { agents, loading, deleteAgent, loadAgents } = useAgents();
+  const { selectedAgent, setSelectedAgent } = useAgentStore();
+  const [form] = Form.useForm();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<AgentSummary | null>(null);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const installedSkillsRef = useRef<string[]>([]);
 
-  useEffect(() => {
-    let cancelled = false;
-    const loadAgents = async () => {
-      setLoading(true);
-      try {
-        const data = await agentsApi.listAgents();
-        if (!cancelled) {
-          setAgents(data.agents);
-        }
-      } catch (error) {
-        console.error("Failed to load agents:", error);
-        message.error(t("agent.loadFailed"));
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadAgents();
-    return () => {
-      cancelled = true;
-    };
-  }, [message, t]);
+  const handleCreate = () => {
+    setEditingAgent(null);
+    form.resetFields();
+    form.setFieldsValue({
+      workspace_dir: "",
+    });
+    setSelectedSkills([]);
+    installedSkillsRef.current = [];
+    setModalVisible(true);
+  };
 
   const handleStart = (agent: AgentSummary) => {
     if (!agent.enabled) {
@@ -57,68 +69,208 @@ export default function HomePage() {
     window.open(targetUrl, "_blank", "noopener,noreferrer");
   };
 
-  const columns: ColumnsType<AgentSummary> = [
-    {
-      title: t("agent.name"),
-      dataIndex: "name",
-      key: "name",
-      render: (_: string, record: AgentSummary) => (
-        <Space>
-          <RobotOutlined />
-          <span>{getAgentDisplayName(record, t)}</span>
-          {!record.enabled && <Tag color="error">{t("agent.disabled")}</Tag>}
-        </Space>
-      ),
-    },
-    {
-      title: t("agent.id"),
-      dataIndex: "id",
-      key: "id",
-      width: 220,
-    },
-    {
-      title: t("agent.description"),
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
-      render: (value?: string) => value || "-",
-    },
-    {
-      title: t("common.actions"),
-      key: "actions",
-      width: 120,
-      render: (_: unknown, record: AgentSummary) => (
-        <Button
-          type="primary"
-          icon={<PlayCircleOutlined />}
-          onClick={() => handleStart(record)}
-          disabled={!record.enabled}
-        >
-          {t("agent.start")}
-        </Button>
-      ),
-    },
-  ];
+  const handleEdit = async (agent: AgentSummary) => {
+    if (agent.id === "default") {
+      return;
+    }
+
+    try {
+      const config = await agentsApi.getAgent(agent.id);
+      setEditingAgent(agent);
+      form.setFieldsValue(config);
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Failed to load agent config:", error);
+      message.error(t("agent.loadConfigFailed"));
+    }
+  };
+
+  const handleDelete = async (agentId: string) => {
+    try {
+      await deleteAgent(agentId);
+
+      if (selectedAgent === agentId) {
+        setSelectedAgent("default");
+        message.info(t("agent.switchedToDefault"));
+      }
+    } catch {
+      message.error(t("agent.deleteFailed"));
+    }
+  };
+
+  const handleInstalledSkillsLoaded = (skills: string[]) => {
+    installedSkillsRef.current = skills;
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      const workspaceRaw = values.workspace_dir;
+      const workspace_dir =
+        typeof workspaceRaw === "string"
+          ? workspaceRaw.trim() || undefined
+          : workspaceRaw;
+      const payload = { ...values, workspace_dir };
+
+      if (editingAgent) {
+        const newSkills = selectedSkills.filter(
+          (skill) => !installedSkillsRef.current.includes(skill),
+        );
+
+        for (const skill of newSkills) {
+          await skillApi.downloadSkillPoolSkill({
+            skill_name: skill,
+            targets: [{ workspace_id: editingAgent.id }],
+          });
+        }
+
+        await agentsApi.updateAgent(editingAgent.id, payload);
+        message.success(t("agent.updateSuccess"));
+      } else {
+        const result = await agentsApi.createAgent({
+          ...payload,
+          skill_names: selectedSkills,
+        });
+        message.success(`${t("agent.createSuccess")} (ID: ${result.id})`);
+      }
+
+      setModalVisible(false);
+      await loadAgents();
+    } catch (error: any) {
+      console.error("Failed to save agent:", error);
+      message.error(error.message || t("agent.saveFailed"));
+    }
+  };
 
   return (
     <div className={styles.page}>
-      <Card className={styles.card}>
-        <div className={styles.header}>
-          <Title level={3} className={styles.title}>
-            {t("agent.agents")}
-          </Title>
-          <Text type="secondary">
-            {t("common.total")}: {agents.length}
-          </Text>
+      <div className={styles.pageInner}>
+        <div className={styles.hero}>
+          <div>
+            <Text className={styles.eyebrow}>{t("agent.parent")}</Text>
+            <Title level={2} className={styles.title}>
+              {t("agent.agents")}
+            </Title>
+            <Paragraph className={styles.subtitle}>
+              {t("common.total")}: {agents.length}
+            </Paragraph>
+          </div>
         </div>
-        <Table
-          rowKey="id"
-          loading={loading}
-          dataSource={agents}
-          columns={columns}
-          pagination={false}
+
+        {loading && agents.length === 0 ? (
+          <div className={styles.loadingState}>
+            <Spin size="large" />
+          </div>
+        ) : agents.length === 0 ? (
+          <div className={styles.emptyState}>
+            <Empty description={`${t("agent.agents")} · 0`} />
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {agents.map((agent) => {
+              const isDefaultAgent = agent.id === "default";
+              const isDisabled = !agent.enabled;
+
+              return (
+                <article
+                  key={agent.id}
+                  className={`${styles.agentCard} ${
+                    isDisabled ? styles.agentCardDisabled : ""
+                  }`}
+                >
+                  <div className={styles.cardHeader}>
+                    <div className={styles.avatarBadge}>
+                      {getAgentAvatar(agent.name)}
+                    </div>
+                    {isDisabled && (
+                      <span className={styles.statusChip}>
+                        {t("agent.disabled")}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={styles.metaBlock}>
+                    <Text className={styles.metaLabel}>{t("agent.id")}</Text>
+                    <Text className={styles.agentId}>{agent.id}</Text>
+                  </div>
+
+                  <div className={styles.contentBlock}>
+                    <Title level={4} className={styles.agentName}>
+                      {getAgentDisplayName(agent, t)}
+                    </Title>
+                    <Paragraph className={styles.agentDescription}>
+                      {agent.description?.trim() || "-"}
+                    </Paragraph>
+                  </div>
+
+                  <div className={styles.actions}>
+                    <Button
+                      type="primary"
+                      block
+                      icon={<PlayCircleOutlined />}
+                      onClick={() => handleStart(agent)}
+                      disabled={isDisabled}
+                    >
+                      {t("agent.start")}
+                    </Button>
+
+                    <div className={styles.actionRow}>
+                      <Button
+                        block
+                        icon={<EditOutlined />}
+                        onClick={() => handleEdit(agent)}
+                        disabled={isDefaultAgent}
+                      >
+                        {t("common.edit")}
+                      </Button>
+
+                      <Popconfirm
+                        title={t("agent.deleteConfirm")}
+                        description={t("agent.deleteConfirmDesc")}
+                        onConfirm={() => handleDelete(agent.id)}
+                        disabled={isDefaultAgent}
+                        okText={t("common.confirm")}
+                        cancelText={t("common.cancel")}
+                      >
+                        <Button
+                          block
+                          danger
+                          icon={<DeleteOutlined />}
+                          disabled={isDefaultAgent}
+                        >
+                          {t("common.delete")}
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+
+            <button
+              type="button"
+              className={styles.addCard}
+              onClick={handleCreate}
+            >
+              <span className={styles.addButton}>
+                <PlusOutlined />
+              </span>
+              <span className={styles.addTitle}>{t("agent.create")}</span>
+            </button>
+          </div>
+        )}
+
+        <AgentModal
+          open={modalVisible}
+          editingAgent={editingAgent}
+          form={form}
+          selectedSkills={selectedSkills}
+          onSelectedSkillsChange={setSelectedSkills}
+          onInstalledSkillsLoaded={handleInstalledSkillsLoaded}
+          onSave={handleSubmit}
+          onCancel={() => setModalVisible(false)}
         />
-      </Card>
+      </div>
     </div>
   );
 }
