@@ -29,7 +29,6 @@ import {
   SparkToolLine,
   SparkDataLine,
   SparkMicLine,
-  SparkAgentLine,
   SparkExitFullscreenLine,
   SparkSearchUserLine,
   SparkMenuExpandLine,
@@ -199,12 +198,6 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
       label: t("nav.agentConfig"),
     },
     {
-      key: "agents",
-      icon: <SparkAgentLine size={18} />,
-      path: "/agents",
-      label: t("nav.agents"),
-    },
-    {
       key: "models",
       icon: <SparkModePlazaLine size={18} />,
       path: "/models",
@@ -305,11 +298,6 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
       key: "settings-group",
       label: collapsed ? null : t("nav.settings"),
       children: [
-        {
-          key: "agents",
-          label: collapsed ? null : t("nav.agents"),
-          icon: <SparkAgentLine size={16} />,
-        },
         {
           key: "models",
           label: collapsed ? null : t("nav.models"),
