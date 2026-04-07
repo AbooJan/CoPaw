@@ -80,6 +80,7 @@ uv.lock
 venv/
 .venv/
 providers.json
+py_venv/
 
 # Logs
 logs/

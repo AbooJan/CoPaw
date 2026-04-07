@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
   Empty,
@@ -27,7 +27,12 @@ import {
   normalizeAgentAvatar,
   shouldPersistAgentAvatar,
 } from "../../utils/agentAvatar";
+import { buildAgentChatLaunchUrl } from "../../utils/agentLaunch";
 import { getAgentDisplayName } from "../../utils/agentDisplayName";
+import {
+  resetDocumentFavicon,
+  setDocumentBaseTitle,
+} from "../../utils/documentIdentity";
 import { useAgentStore } from "../../stores/agentStore";
 import { AgentModal } from "../Settings/Agents/components";
 import { useAgents } from "../Settings/Agents/useAgents";
@@ -49,6 +54,11 @@ export default function HomePage() {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const installedSkillsRef = useRef<string[]>([]);
 
+  useEffect(() => {
+    setDocumentBaseTitle(t("home.pageTitle"));
+    resetDocumentFavicon();
+  }, [t]);
+
   const handleCreate = () => {
     setEditingAgent(null);
     form.resetFields();
@@ -67,12 +77,11 @@ export default function HomePage() {
       return;
     }
 
-    const basePath = window.location.pathname.startsWith("/console")
-      ? "/console"
-      : "";
-    const targetUrl = `${basePath}/chat?agentId=${encodeURIComponent(
-      agent.id,
-    )}`;
+    const targetUrl = buildAgentChatLaunchUrl({
+      agentId: agent.id,
+      agentName: getAgentDisplayName(agent, t),
+      agentAvatar: normalizeAgentAvatar(avatars[agent.id]),
+    });
     window.open(targetUrl, "_blank", "noopener,noreferrer");
   };
 

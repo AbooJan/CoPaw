@@ -48,6 +48,9 @@
     "tokenUsage": "Token 消耗",
     "voiceTranscription": "语音转写"
   },
+  "home": {
+    "pageTitle": "CoPaw 首页"
+  },
   "workspace": {
     "title": "文件",
     "workspacePath": "工作区路径：",

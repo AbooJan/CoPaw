@@ -19,8 +19,17 @@ import { providerApi } from "../../api/modules/provider";
 import type { ProviderInfo, ModelInfo } from "../../api/types";
 import ModelSelector from "./ModelSelector";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useAgentAvatars } from "../../hooks/useAgentAvatars";
 import { useAgentStore } from "../../stores/agentStore";
 import { useChatAnywhereInput } from "@agentscope-ai/chat";
+import { normalizeAgentAvatar } from "../../utils/agentAvatar";
+import { getAgentDisplayName } from "../../utils/agentDisplayName";
+import { getInitialAgentLaunchPayload } from "../../utils/agentLaunch";
+import {
+  buildEmojiFaviconDataUrl,
+  setDocumentBaseTitle,
+  setDocumentFavicon,
+} from "../../utils/documentIdentity";
 import styles from "./index.module.less";
 import { IconButton } from "@agentscope-ai/design";
 import ChatActionGroup from "./components/ChatActionGroup";
@@ -269,11 +278,15 @@ export default function ChatPage() {
     return match?.[1];
   }, [location.pathname]);
   const [showModelPrompt, setShowModelPrompt] = useState(false);
-  const { selectedAgent, setSelectedAgent } = useAgentStore();
+  const { selectedAgent, setSelectedAgent, agents } = useAgentStore();
+  const { avatars } = useAgentAvatars();
   const [refreshKey, setRefreshKey] = useState(0);
   const runtimeLoadingBridgeRef = useRef<RuntimeLoadingBridgeApi | null>(null);
   const { message } = useAppMessage();
   const launchAgentHandledRef = useRef(false);
+  const initialLaunchAgentRef = useRef(
+    getInitialAgentLaunchPayload(searchParams),
+  );
   const launchAgentId = searchParams.get("agentId");
 
   const isChatActiveRef = useRef(false);
@@ -301,6 +314,48 @@ export default function ChatPage() {
     navigate,
     location.pathname,
   ]);
+
+  const currentAgentInfo = useMemo(
+    () => agents.find((agent) => agent.id === selectedAgent),
+    [agents, selectedAgent],
+  );
+  const pageAgentName = useMemo(() => {
+    if (currentAgentInfo) {
+      return getAgentDisplayName(currentAgentInfo, t);
+    }
+
+    const launchAgent = initialLaunchAgentRef.current;
+    if (
+      launchAgent.agentId === selectedAgent &&
+      launchAgent.agentName?.trim()
+    ) {
+      return launchAgent.agentName.trim();
+    }
+
+    return getAgentDisplayName(
+      {
+        id: selectedAgent,
+        name: selectedAgent,
+      },
+      t,
+    );
+  }, [currentAgentInfo, selectedAgent, t]);
+  const pageAgentAvatar = useMemo(() => {
+    const launchAgent = initialLaunchAgentRef.current;
+    const initialAvatar =
+      launchAgent.agentId === selectedAgent ? launchAgent.agentAvatar : null;
+
+    return normalizeAgentAvatar(avatars[selectedAgent] ?? initialAvatar);
+  }, [avatars, selectedAgent]);
+
+  useEffect(() => {
+    if (!selectedAgent) {
+      return;
+    }
+
+    setDocumentBaseTitle(`${pageAgentAvatar} ${pageAgentName}`);
+    setDocumentFavicon(buildEmojiFaviconDataUrl(pageAgentAvatar));
+  }, [pageAgentAvatar, pageAgentName, selectedAgent]);
 
   // Use custom hooks for better separation of concerns
   const isComposingRef = useIMEComposition(isChatActive);

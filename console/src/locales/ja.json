@@ -45,6 +45,9 @@
     "voiceTranscription": "音声文字起こし",
     "agents": "エージェント管理"
   },
+  "home": {
+    "pageTitle": "CoPaw ホーム"
+  },
   "agent": {
     "parent": "設定",
     "agents": "エージェント",

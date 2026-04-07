@@ -45,6 +45,9 @@
     "voiceTranscription": "Транскрипция голоса",
     "agents": "Управление агентами"
   },
+  "home": {
+    "pageTitle": "Главная CoPaw"
+  },
   "agent": {
     "parent": "Настройки",
     "agents": "Агенты",

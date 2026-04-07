@@ -48,6 +48,9 @@
     "tokenUsage": "Token Usage",
     "voiceTranscription": "Voice Transcription"
   },
+  "home": {
+    "pageTitle": "CoPaw Home"
+  },
   "voiceTranscription": {
     "title": "Voice Transcription",
     "description": "Configure how incoming audio and voice messages are handled.",

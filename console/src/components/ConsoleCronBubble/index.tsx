@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { consoleApi, type PushMessage } from "../../api/modules/console";
+import { getDocumentBaseTitle } from "../../utils/documentIdentity";
 import styles from "./index.module.less";
 
 const POLL_INTERVAL_MS = 2500;
@@ -18,16 +19,11 @@ export default function ConsoleCronBubble() {
   const [items, setItems] = useState<BubbleItem[]>([]);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
-  const originalTitleRef = useRef(document.title);
   const blinkRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const dismiss = (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
-
-  useEffect(() => {
-    originalTitleRef.current = document.title;
-  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -75,9 +71,9 @@ export default function ConsoleCronBubble() {
 
   useEffect(() => {
     if (items.length === 0 || !document.hidden || blinkRef.current) return;
-    const original = originalTitleRef.current;
     let showPrefix = true;
     blinkRef.current = setInterval(() => {
+      const original = getDocumentBaseTitle();
       document.title = showPrefix
         ? `${TITLE_BLINK_PREFIX}${original}`
         : original;
@@ -88,7 +84,7 @@ export default function ConsoleCronBubble() {
         clearInterval(blinkRef.current);
         blinkRef.current = null;
       }
-      document.title = original;
+      document.title = getDocumentBaseTitle();
     };
   }, [items.length]);
 
@@ -99,7 +95,7 @@ export default function ConsoleCronBubble() {
           clearInterval(blinkRef.current);
           blinkRef.current = null;
         }
-        document.title = originalTitleRef.current;
+        document.title = getDocumentBaseTitle();
       }
     };
     document.addEventListener("visibilitychange", onVisibility);

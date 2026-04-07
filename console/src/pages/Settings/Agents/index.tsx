@@ -17,6 +17,8 @@ import {
   normalizeAgentAvatar,
   shouldPersistAgentAvatar,
 } from "../../../utils/agentAvatar";
+import { buildAgentChatLaunchUrl } from "../../../utils/agentLaunch";
+import { getAgentDisplayName } from "../../../utils/agentDisplayName";
 import { useAgents } from "./useAgents";
 import { AgentTable, AgentModal } from "./components";
 import { PageHeader } from "@/components/PageHeader";
@@ -96,12 +98,11 @@ export default function AgentsPage() {
       return;
     }
 
-    const basePath = window.location.pathname.startsWith("/console")
-      ? "/console"
-      : "";
-    const targetUrl = `${basePath}/chat?agentId=${encodeURIComponent(
-      agent.id,
-    )}`;
+    const targetUrl = buildAgentChatLaunchUrl({
+      agentId: agent.id,
+      agentName: getAgentDisplayName(agent, t),
+      agentAvatar: normalizeAgentAvatar(avatars[agent.id]),
+    });
     window.open(targetUrl, "_blank", "noopener,noreferrer");
   };
 
