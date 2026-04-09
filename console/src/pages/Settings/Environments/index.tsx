@@ -6,6 +6,7 @@ import api from "../../../api";
 import { useEnvVars } from "./useEnvVars";
 import { EmptyState, AddButton, Toolbar, EnvRow, type Row } from "./components";
 import { PageHeader } from "@/components/PageHeader";
+import SettingsBreadcrumbLink from "../components/SettingsBreadcrumbLink";
 import { useAppMessage } from "../../../hooks/useAppMessage";
 import styles from "./index.module.less";
 
@@ -262,7 +263,7 @@ function EnvironmentsPage() {
     <div className={styles.environmentsPage}>
       {/* ---- Page header ---- */}
       <PageHeader
-        parent={t("environments.parent")}
+        parent={<SettingsBreadcrumbLink />}
         current={t("environments.environments")}
       />
 

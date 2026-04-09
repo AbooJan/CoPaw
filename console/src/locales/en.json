@@ -51,6 +51,16 @@
   "home": {
     "pageTitle": "CoPaw Home"
   },
+  "settingsLanding": {
+    "title": "Settings Hub",
+    "description": "Browse and enter CoPaw's core settings in one place, including models, skill pool, environment variables, security, token usage, and voice transcription.",
+    "modelsDescription": "Configure model providers, active models, and local model capabilities.",
+    "skillPoolDescription": "Manage the shared skill pool with import, broadcast, and batch maintenance tools.",
+    "environmentsDescription": "Edit environment variables in one place for models, services, and third-party integrations.",
+    "securityDescription": "Control tool guard, file guard, and skill scanning related security policies.",
+    "tokenUsageDescription": "Inspect token usage over time with model and date level breakdowns.",
+    "voiceTranscriptionDescription": "Configure audio handling, transcription providers, and local Whisper capabilities."
+  },
   "voiceTranscription": {
     "title": "Voice Transcription",
     "description": "Configure how incoming audio and voice messages are handled.",

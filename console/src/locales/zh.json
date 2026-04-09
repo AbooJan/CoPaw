@@ -51,6 +51,16 @@
   "home": {
     "pageTitle": "CoPaw 首页"
   },
+  "settingsLanding": {
+    "title": "设置中心",
+    "description": "统一查看和进入 CoPaw 的核心设置项，包括模型、技能池、环境变量、安全、Token 消耗和语音转写。",
+    "modelsDescription": "配置模型提供商、激活模型与本地模型能力。",
+    "skillPoolDescription": "管理共享技能池，支持导入、广播和批量维护技能。",
+    "environmentsDescription": "集中编辑环境变量，便于模型、服务和第三方集成配置。",
+    "securityDescription": "管理工具防护、文件防护与技能扫描等安全策略。",
+    "tokenUsageDescription": "查看一段时间内的 Token 消耗统计，按模型和日期分析。",
+    "voiceTranscriptionDescription": "配置语音消息处理方式、转写提供方和本地 Whisper 能力。"
+  },
   "workspace": {
     "title": "文件",
     "workspacePath": "工作区路径：",

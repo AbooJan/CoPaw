@@ -12,6 +12,7 @@ import {
   EditOutlined,
   PlusOutlined,
   PlayCircleOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { agentsApi } from "../../api/modules/agents";
@@ -175,6 +176,14 @@ export default function HomePage() {
           <Title level={2} className={styles.title}>
             {t("agent.agents")}
           </Title>
+          <Button
+            type="default"
+            icon={<SettingOutlined />}
+            className={styles.settingsEntry}
+            onClick={() => window.open("/settings", "_blank", "noopener,noreferrer")}
+          >
+            {t("settingsLanding.title")}
+          </Button>
         </div>
 
         {loading && agents.length === 0 ? (

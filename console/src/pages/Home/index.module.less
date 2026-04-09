@@ -38,6 +38,17 @@
   letter-spacing: -0.02em;
 }
 
+.settingsEntry {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border-color: rgba(43, 18, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 12px 24px rgba(43, 18, 0, 0.06);
+  color: #1a1716 !important;
+  font-weight: 500;
+}
+
 .subtitle {
   margin: 0 !important;
   color: rgba(26, 23, 22, 0.55) !important;
@@ -258,6 +269,13 @@
   color: rgba(255, 255, 255, 0.92) !important;
 }
 
+:global(.dark-mode) .settingsEntry {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(32, 32, 32, 0.88) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
 :global(.dark-mode) .subtitle {
   color: rgba(255, 255, 255, 0.56) !important;
 }
@@ -339,11 +357,18 @@
 
   .hero {
     margin-bottom: 18px;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .title {
     font-size: 28px !important;
     line-height: 1.12 !important;
+  }
+
+  .settingsEntry {
+    width: 100%;
+    justify-content: center;
   }
 
   .grid {

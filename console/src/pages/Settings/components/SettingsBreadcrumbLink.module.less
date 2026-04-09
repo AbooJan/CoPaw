@@ -1,0 +1,29 @@
+.link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #999;
+  font: inherit;
+  font-weight: 400;
+  line-height: inherit;
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+.link:hover {
+  color: #666;
+}
+
+.link:focus-visible {
+  outline: 2px solid rgba(255, 127, 22, 0.28);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+:global(.dark-mode) .link {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+:global(.dark-mode) .link:hover {
+  color: rgba(255, 255, 255, 0.62);
+}

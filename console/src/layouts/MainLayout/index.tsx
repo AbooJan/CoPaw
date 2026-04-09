@@ -21,6 +21,7 @@ import SecurityPage from "../../pages/Settings/Security";
 import TokenUsagePage from "../../pages/Settings/TokenUsage";
 import VoiceTranscriptionPage from "../../pages/Settings/VoiceTranscription";
 import AgentsPage from "../../pages/Settings/Agents";
+import SettingsLandingPage from "../../pages/Settings";
 
 const { Content } = Layout;
 
@@ -42,23 +43,41 @@ const pathToKey: Record<string, string> = {
   "/security": "security",
   "/token-usage": "token-usage",
   "/voice-transcription": "voice-transcription",
+  "/settings": "settings",
 };
 
 export default function MainLayout() {
   const location = useLocation();
   const currentPath = location.pathname;
   const selectedKey = pathToKey[currentPath] || "agents";
+  const hideSidebar = currentPath === "/settings" || currentPath.startsWith("/settings/");
 
   return (
     <Layout className={styles.mainLayout}>
       <Header />
       <Layout>
-        <Sidebar selectedKey={selectedKey} />
+        {hideSidebar ? null : <Sidebar selectedKey={selectedKey} />}
         <Content className="page-container">
           <ConsoleCronBubble />
           <div className="page-content">
             <Routes>
               <Route path="/" element={<Navigate to="/agents" replace />} />
+              <Route path="/settings" element={<SettingsLandingPage />} />
+              <Route path="/settings/models" element={<ModelsPage />} />
+              <Route path="/settings/skill-pool" element={<SkillPoolPage />} />
+              <Route
+                path="/settings/environments"
+                element={<EnvironmentsPage />}
+              />
+              <Route path="/settings/security" element={<SecurityPage />} />
+              <Route
+                path="/settings/token-usage"
+                element={<TokenUsagePage />}
+              />
+              <Route
+                path="/settings/voice-transcription"
+                element={<VoiceTranscriptionPage />}
+              />
               <Route path="/chat/*" element={<Chat />} />
               <Route path="/channels" element={<ChannelsPage />} />
               <Route path="/sessions" element={<SessionsPage />} />

@@ -26,6 +26,7 @@ import {
 } from "./components";
 import { useSkillPool } from "./useSkillPool";
 import { PageHeader } from "@/components/PageHeader";
+import SettingsBreadcrumbLink from "../components/SettingsBreadcrumbLink";
 import styles from "./index.module.less";
 
 function SkillPoolPage() {
@@ -35,7 +36,10 @@ function SkillPoolPage() {
   return (
     <div className={styles.skillsPage}>
       <PageHeader
-        items={[{ title: t("nav.settings") }, { title: t("nav.skillPool") }]}
+        items={[
+          { title: <SettingsBreadcrumbLink /> },
+          { title: t("nav.skillPool") },
+        ]}
         extra={
           <div className={styles.headerRight}>
             <input

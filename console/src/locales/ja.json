@@ -48,6 +48,16 @@
   "home": {
     "pageTitle": "CoPaw ホーム"
   },
+  "settingsLanding": {
+    "title": "設定ハブ",
+    "description": "CoPaw の主要な設定項目を 1 か所で確認して移動できます。モデル、スキルプール、環境変数、セキュリティ、トークン使用量、音声文字起こしをまとめて扱えます。",
+    "modelsDescription": "モデルプロバイダー、有効モデル、ローカルモデル機能を設定します。",
+    "skillPoolDescription": "共有スキルプールを管理し、インポート、配布、まとめて保守できます。",
+    "environmentsDescription": "モデルやサービス、外部連携向けの環境変数を一括編集します。",
+    "securityDescription": "ツールガード、ファイルガード、スキルスキャンなどの安全設定を管理します。",
+    "tokenUsageDescription": "期間ごとのトークン使用量を、モデル別・日付別に確認します。",
+    "voiceTranscriptionDescription": "音声メッセージの処理方法、文字起こしプロバイダー、ローカル Whisper 機能を設定します。"
+  },
   "agent": {
     "parent": "設定",
     "agents": "エージェント",

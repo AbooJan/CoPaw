@@ -10,6 +10,7 @@ import {
 } from "./components";
 import { PageHeader } from "@/components/PageHeader";
 import { useTranslation } from "react-i18next";
+import SettingsBreadcrumbLink from "../components/SettingsBreadcrumbLink";
 import type { ProviderInfo } from "../../../api/types/provider";
 import styles from "./index.module.less";
 
@@ -79,7 +80,7 @@ function ModelsPage() {
         <>
           {/* ---- LLM Section (top) ---- */}
           <PageHeader
-            parent={t("nav.settings")}
+            parent={<SettingsBreadcrumbLink />}
             current={t("models.llmTitle")}
           />
           {/* ---- Scrollable Content ---- */}

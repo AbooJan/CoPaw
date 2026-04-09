@@ -294,42 +294,6 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
         },
       ],
     },
-    {
-      key: "settings-group",
-      label: collapsed ? null : t("nav.settings"),
-      children: [
-        {
-          key: "models",
-          label: collapsed ? null : t("nav.models"),
-          icon: <SparkModePlazaLine size={16} />,
-        },
-        {
-          key: "skill-pool",
-          label: collapsed ? null : t("nav.skillPool", "Skill Pool"),
-          icon: <SparkOtherLine size={16} />,
-        },
-        {
-          key: "environments",
-          label: collapsed ? null : t("nav.environments"),
-          icon: <SparkInternetLine size={16} />,
-        },
-        {
-          key: "security",
-          label: collapsed ? null : t("nav.security"),
-          icon: <SparkBrowseLine size={16} />,
-        },
-        {
-          key: "token-usage",
-          label: collapsed ? null : t("nav.tokenUsage"),
-          icon: <SparkDataLine size={16} />,
-        },
-        {
-          key: "voice-transcription",
-          label: collapsed ? null : t("nav.voiceTranscription"),
-          icon: <SparkMicLine size={16} />,
-        },
-      ],
-    },
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────

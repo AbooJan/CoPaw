@@ -12,6 +12,7 @@ import type {
 import { formatCompact } from "../../../utils/formatNumber";
 import { LoadingState, EmptyState } from "./components";
 import { PageHeader } from "@/components/PageHeader";
+import SettingsBreadcrumbLink from "../components/SettingsBreadcrumbLink";
 import { useAppMessage } from "../../../hooks/useAppMessage";
 import styles from "./index.module.less";
 
@@ -138,7 +139,10 @@ function TokenUsagePage() {
 
   return (
     <div className={styles.tokenUsagePage}>
-      <PageHeader parent={t("nav.settings")} current={t("tokenUsage.title")} />
+      <PageHeader
+        parent={<SettingsBreadcrumbLink />}
+        current={t("tokenUsage.title")}
+      />
       <div className={styles.content}>
         {loading && !data ? (
           <LoadingState

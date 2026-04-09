@@ -20,6 +20,7 @@ import {
   FileGuardSection,
 } from "./components";
 import { PageHeader } from "@/components/PageHeader";
+import SettingsBreadcrumbLink from "../components/SettingsBreadcrumbLink";
 import styles from "./index.module.less";
 
 const BUILTIN_TOOLS = [
@@ -231,7 +232,7 @@ function SecurityPage() {
   return (
     <div className={styles.securityPage}>
       <PageHeader
-        parent={t("security.parent")}
+        parent={<SettingsBreadcrumbLink />}
         current={t("security.security")}
       />
 

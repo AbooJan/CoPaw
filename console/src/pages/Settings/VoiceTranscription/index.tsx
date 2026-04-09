@@ -4,6 +4,7 @@ import { Radio, Select, Space, Spin, Alert } from "antd";
 import { useTranslation } from "react-i18next";
 import api from "../../../api";
 import { PageHeader } from "@/components/PageHeader";
+import SettingsBreadcrumbLink from "../components/SettingsBreadcrumbLink";
 import { useAppMessage } from "../../../hooks/useAppMessage";
 import styles from "./index.module.less";
 
@@ -96,7 +97,7 @@ function VoiceTranscriptionPage() {
     <div className={styles.voiceTranscriptionPage}>
       <PageHeader
         items={[
-          { title: t("nav.settings") },
+          { title: <SettingsBreadcrumbLink /> },
           { title: t("voiceTranscription.title") },
         ]}
       />

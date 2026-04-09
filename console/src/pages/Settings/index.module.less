@@ -1,0 +1,179 @@
+.page {
+  min-height: calc(100vh - 128px);
+  padding: 0 20px 24px;
+}
+
+.hero {
+  margin: 4px 0 24px;
+  padding: 28px;
+  border: 1px solid rgba(43, 18, 0, 0.08);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 127, 22, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 247, 241, 0.94) 100%);
+  box-shadow:
+    0 18px 48px rgba(43, 18, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 127, 22, 0.12);
+  color: #a64b00;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  margin: 14px 0 8px;
+  color: #1a1716;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.heroDescription {
+  max-width: 760px;
+  margin: 0 !important;
+  color: rgba(26, 23, 22, 0.6) !important;
+  font-size: 15px;
+  line-height: 1.7 !important;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  height: 100%;
+  border-radius: 24px !important;
+  border-color: rgba(43, 18, 0, 0.08) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 247, 241, 0.94) 100%) !important;
+  box-shadow: 0 16px 36px rgba(43, 18, 0, 0.07);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  :global(.ant-card-body) {
+    height: 100%;
+    padding: 22px;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 127, 22, 0.24) !important;
+    box-shadow: 0 22px 44px rgba(43, 18, 0, 0.1);
+  }
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.cardIcon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffb36d 0%, #ff7f16 100%);
+  box-shadow: 0 14px 28px rgba(255, 127, 22, 0.22);
+  color: #fff;
+  font-size: 22px;
+}
+
+.cardArrow {
+  color: rgba(26, 23, 22, 0.34);
+  font-size: 16px;
+}
+
+.cardTitle {
+  margin-bottom: 8px;
+  color: #1a1716;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cardDescription {
+  margin: 0 !important;
+  color: rgba(26, 23, 22, 0.58) !important;
+  font-size: 14px;
+  line-height: 1.65 !important;
+}
+
+:global(.dark-mode) .hero {
+  border-color: rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(255, 127, 22, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(34, 34, 34, 0.96) 0%, rgba(24, 24, 24, 0.98) 100%);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+:global(.dark-mode) .heroBadge {
+  background: rgba(255, 127, 22, 0.18);
+  color: #ffb36d;
+}
+
+:global(.dark-mode) .heroTitle {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+:global(.dark-mode) .heroDescription,
+:global(.dark-mode) .cardDescription {
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+:global(.dark-mode) .card {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background:
+    linear-gradient(180deg, rgba(34, 34, 34, 0.96) 0%, rgba(24, 24, 24, 0.98) 100%) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  &:hover {
+    border-color: rgba(255, 127, 22, 0.26) !important;
+    box-shadow: 0 24px 56px rgba(0, 0, 0, 0.38);
+  }
+}
+
+:global(.dark-mode) .cardTitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+:global(.dark-mode) .cardArrow {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 0 12px 20px;
+  }
+
+  .hero {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .heroTitle {
+    font-size: 26px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
