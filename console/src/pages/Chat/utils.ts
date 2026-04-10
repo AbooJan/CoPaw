@@ -205,3 +205,10 @@ export function setTextareaValue(textarea: HTMLTextAreaElement, value: string) {
   const event = new Event("input", { bubbles: true });
   textarea.dispatchEvent(event);
 }
+
+/** Find the active chat composer textarea inside the current page. */
+export function getChatTextarea(
+  root: ParentNode = document,
+): HTMLTextAreaElement | null {
+  return root.querySelector("textarea");
+}

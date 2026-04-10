@@ -43,12 +43,14 @@ import {
   normalizeContentUrls,
   extractUserMessageText,
   extractTextFromMessage,
+  getChatTextarea,
   setTextareaValue,
   type CopyableResponse,
   type RuntimeLoadingBridgeApi,
 } from "./utils";
 
 const CHAT_ATTACHMENT_MAX_MB = 10;
+const CHAT_DRAFT_STORAGE_KEY = "copaw-chat-draft";
 
 interface SessionInfo {
   session_id?: string;
@@ -63,6 +65,58 @@ interface CustomWindow extends Window {
 }
 
 declare const window: CustomWindow;
+
+function getDraftStorageId(chatId?: string) {
+  return chatId?.trim() || "__new__";
+}
+
+function buildDraftStorageKey(agentId: string, chatId?: string) {
+  return `${agentId}::${getDraftStorageId(chatId)}`;
+}
+
+function saveChatDraft(agentId: string, chatId: string | undefined, value: string) {
+  if (typeof window === "undefined") return;
+  const storageKey = buildDraftStorageKey(agentId, chatId);
+  const nextValue = value.trim();
+
+  try {
+    const raw = window.sessionStorage.getItem(CHAT_DRAFT_STORAGE_KEY);
+    const drafts = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+
+    if (nextValue) {
+      drafts[storageKey] = value;
+    } else {
+      delete drafts[storageKey];
+    }
+
+    if (Object.keys(drafts).length === 0) {
+      window.sessionStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
+      return;
+    }
+
+    window.sessionStorage.setItem(CHAT_DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+  } catch (error) {
+    console.error("Failed to persist chat draft:", error);
+  }
+}
+
+function loadChatDraft(agentId: string, chatId?: string): string {
+  if (typeof window === "undefined") return "";
+
+  try {
+    const raw = window.sessionStorage.getItem(CHAT_DRAFT_STORAGE_KEY);
+    if (!raw) return "";
+    const drafts = JSON.parse(raw) as Record<string, string>;
+    return drafts[buildDraftStorageKey(agentId, chatId)] ?? "";
+  } catch (error) {
+    console.error("Failed to read chat draft:", error);
+    return "";
+  }
+}
+
+function clearChatDraft(agentId: string, chatId?: string) {
+  saveChatDraft(agentId, chatId, "");
+}
 
 interface CommandSuggestion {
   command: string;
@@ -511,10 +565,22 @@ export default function ChatPage() {
   const chatIdRef = useRef(chatId);
   const navigateRef = useRef(navigate);
   const chatRef = useRef<IAgentScopeRuntimeWebUIRef>(null);
+  const selectedAgentRef = useRef(selectedAgent);
+
+  selectedAgentRef.current = selectedAgent;
 
   useMessageHistoryNavigation(chatRef, isChatActive, isComposingRef);
   chatIdRef.current = chatId;
   navigateRef.current = navigate;
+
+  const persistCurrentDraft = useCallback(() => {
+    const textarea = getChatTextarea();
+    saveChatDraft(
+      selectedAgentRef.current,
+      chatIdRef.current,
+      textarea?.value ?? "",
+    );
+  }, []);
 
   // Tell sessionApi which session to put first in getSessionList, so the library's
   // useMount auto-selects the correct session without an extra getSession round-trip.
@@ -523,6 +589,19 @@ export default function ChatPage() {
   }
 
   // Register session API event callbacks for URL synchronization
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      persistCurrentDraft();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      persistCurrentDraft();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [persistCurrentDraft]);
 
   useEffect(() => {
     sessionApi.onSessionIdResolved = (realId) => {
@@ -629,6 +708,31 @@ export default function ChatPage() {
     prevSelectedAgentRef.current = selectedAgent;
   }, [selectedAgent, setLastChatId, getLastChatId]);
 
+  useEffect(() => {
+    if (!isChatActive()) {
+      return;
+    }
+
+    const draft = loadChatDraft(selectedAgent, chatId);
+    if (!draft) {
+      return;
+    }
+
+    const restoreDraft = () => {
+      const textarea = getChatTextarea();
+      if (!textarea) {
+        window.requestAnimationFrame(restoreDraft);
+        return;
+      }
+      if (textarea.value === draft) {
+        return;
+      }
+      setTextareaValue(textarea, draft);
+    };
+
+    restoreDraft();
+  }, [selectedAgent, chatId, refreshKey, isChatActive]);
+
   const copyResponse = useCallback(
     async (response: CopyableResponse) => {
       try {
@@ -691,6 +795,8 @@ export default function ChatPage() {
         stream: true,
         ...biz_params,
       };
+
+      clearChatDraft(selectedAgentRef.current, chatIdRef.current);
 
       const backendChatId =
         sessionApi.getRealIdForSession(requestBody.session_id) ??
