@@ -166,6 +166,7 @@
     "descriptionPlaceholder": "Briefly describe this agent's purpose...",
     "workspaceHelp": "Leave empty to auto-generate in ~/.copaw/workspaces/<id>",
     "dragHandleTooltip": "Drag to reorder agents",
+    "dragSortHint": "Drag the handle in the top-right corner to reorder",
     "reorderSuccess": "Agent order saved",
     "reorderFailed": "Failed to save agent order",
     "defaultNotEditable": "Default agent cannot be edited",

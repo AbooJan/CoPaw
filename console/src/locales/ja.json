@@ -103,6 +103,7 @@
     "descriptionPlaceholder": "このエージェントの目的を簡単に説明してください...",
     "workspaceHelp": "空欄のままにすると、~/.copaw/workspaces/<id> に自動生成されます",
     "dragHandleTooltip": "ドラッグしてエージェントの順序を変更",
+    "dragSortHint": "右上のハンドルをドラッグすると並び替えできます",
     "reorderSuccess": "エージェントの順序を保存しました",
     "reorderFailed": "エージェントの順序を保存できませんでした",
     "defaultNotEditable": "デフォルトのエージェントは編集できません",

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Button,
   Empty,
@@ -14,6 +14,18 @@ import {
   PlayCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useTranslation } from "react-i18next";
 import { agentsApi } from "../../api/modules/agents";
 import { skillApi } from "../../api/modules/skill";
@@ -38,6 +50,8 @@ import { useAgentStore } from "../../stores/agentStore";
 import { AgentModal } from "../Settings/Agents/components";
 import { useAgents } from "../Settings/Agents/useAgents";
 import { agentAvatarApi } from "../../api/modules/agentAvatar";
+import { reorderAgents } from "../Settings/Agents/reorder";
+import SortableAgentCard from "./SortableAgentCard";
 import styles from "./index.module.less";
 
 const { Title, Text, Paragraph } = Typography;
@@ -45,7 +59,7 @@ const { Title, Text, Paragraph } = Typography;
 export default function HomePage() {
   const { t } = useTranslation();
   const { message } = useAppMessage();
-  const { agents, loading, deleteAgent, loadAgents } = useAgents();
+  const { agents, loading, deleteAgent, loadAgents, setAgents } = useAgents();
   const { avatars, loadAvatars } = useAgentAvatars();
   const { selectedAgent, setSelectedAgent } = useAgentStore();
   const [form] = Form.useForm();
@@ -53,12 +67,22 @@ export default function HomePage() {
   const [editingAgent, setEditingAgent] = useState<AgentSummary | null>(null);
   const [draftAvatar, setDraftAvatar] = useState(DEFAULT_AGENT_AVATAR);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [reordering, setReordering] = useState(false);
   const installedSkillsRef = useRef<string[]>([]);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+  );
 
   useEffect(() => {
     setDocumentBaseTitle(t("home.pageTitle"));
     resetDocumentFavicon();
   }, [t]);
+
+  const sortableIds = useMemo(() => agents.map((agent) => agent.id), [agents]);
 
   const handleCreate = () => {
     setEditingAgent(null);
@@ -120,6 +144,33 @@ export default function HomePage() {
     installedSkillsRef.current = skills;
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || reordering) {
+      return;
+    }
+
+    const previousAgents = agents;
+    const nextAgents = reorderAgents(agents, String(active.id), String(over.id));
+    if (nextAgents === previousAgents) {
+      return;
+    }
+
+    setAgents(nextAgents);
+    setReordering(true);
+
+    try {
+      await agentsApi.reorderAgents(nextAgents.map((agent) => agent.id));
+      message.success(t("agent.reorderSuccess"));
+    } catch (error) {
+      console.error("Failed to reorder agents from home:", error);
+      setAgents(previousAgents);
+      message.error(t("agent.reorderFailed"));
+    } finally {
+      setReordering(false);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -173,9 +224,14 @@ export default function HomePage() {
     <div className={styles.page}>
       <div className={styles.pageInner}>
         <div className={styles.hero}>
-          <Title level={2} className={styles.title}>
-            {t("agent.agents")}
-          </Title>
+          <div>
+            <Title level={2} className={styles.title}>
+              {t("agent.agents")}
+            </Title>
+            <Paragraph className={styles.subtitle}>
+              {t("agent.dragSortHint")}
+            </Paragraph>
+          </div>
           <Button
             type="default"
             icon={<SettingOutlined />}
@@ -195,18 +251,26 @@ export default function HomePage() {
             <Empty description={`${t("agent.agents")} · 0`} />
           </div>
         ) : (
-          <div className={styles.grid}>
-            {agents.map((agent) => {
-              const isDefaultAgent = agent.id === "default";
-              const isDisabled = !agent.enabled;
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={sortableIds} strategy={rectSortingStrategy}>
+              <div className={styles.grid}>
+                {agents.map((agent) => {
+                  const isDefaultAgent = agent.id === "default";
+                  const isDisabled = !agent.enabled;
 
-              return (
-                <article
-                  key={agent.id}
-                  className={`${styles.agentCard} ${
-                    isDisabled ? styles.agentCardDisabled : ""
-                  }`}
-                >
+                  return (
+                    <SortableAgentCard
+                      key={agent.id}
+                      id={agent.id}
+                      dragDisabled={reordering || loading}
+                      className={`${styles.agentCard} ${
+                        isDisabled ? styles.agentCardDisabled : ""
+                      }`}
+                    >
                   <div className={styles.cardHeader}>
                     <div className={styles.avatarBadge}>
                       {normalizeAgentAvatar(avatars[agent.id])}
@@ -272,22 +336,24 @@ export default function HomePage() {
                       </Popconfirm>
                     </div>
                   </div>
-                </article>
-              );
-            })}
+                    </SortableAgentCard>
+                  );
+                })}
 
-            <button
-              type="button"
-              className={styles.addCard}
-              onClick={handleCreate}
-            >
-              <span className={styles.addButton}>
-                <PlusOutlined />
-              </span>
-              <span className={styles.addTitle}>{t("agent.create")}</span>
-              <span className={styles.addHint}>{t("agent.createTitle")}</span>
-            </button>
-          </div>
+                <button
+                  type="button"
+                  className={styles.addCard}
+                  onClick={handleCreate}
+                >
+                  <span className={styles.addButton}>
+                    <PlusOutlined />
+                  </span>
+                  <span className={styles.addTitle}>{t("agent.create")}</span>
+                  <span className={styles.addHint}>{t("agent.createTitle")}</span>
+                </button>
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
 
         <AgentModal
