@@ -21,14 +21,9 @@ import {
   SparkVoiceChat01Line,
   SparkMagicWandLine,
   SparkLocalFileLine,
-  SparkModePlazaLine,
-  SparkInternetLine,
   SparkModifyLine,
-  SparkBrowseLine,
   SparkMcpMcpLine,
   SparkToolLine,
-  SparkDataLine,
-  SparkMicLine,
   SparkExitFullscreenLine,
   SparkSearchUserLine,
   SparkMenuExpandLine,
@@ -70,7 +65,7 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
     authApi
       .getStatus()
       .then((res) => setAuthEnabled(res.enabled))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -196,37 +191,7 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
       icon: <SparkModifyLine size={18} />,
       path: "/agent-config",
       label: t("nav.agentConfig"),
-    },
-    {
-      key: "models",
-      icon: <SparkModePlazaLine size={18} />,
-      path: "/models",
-      label: t("nav.models"),
-    },
-    {
-      key: "environments",
-      icon: <SparkInternetLine size={18} />,
-      path: "/environments",
-      label: t("nav.environments"),
-    },
-    {
-      key: "security",
-      icon: <SparkBrowseLine size={18} />,
-      path: "/security",
-      label: t("nav.security"),
-    },
-    {
-      key: "token-usage",
-      icon: <SparkDataLine size={18} />,
-      path: "/token-usage",
-      label: t("nav.tokenUsage"),
-    },
-    {
-      key: "voice-transcription",
-      icon: <SparkMicLine size={18} />,
-      path: "/voice-transcription",
-      label: t("nav.voiceTranscription"),
-    },
+    }
   ];
 
   // ── Menu items ────────────────────────────────────────────────────────────
@@ -301,9 +266,8 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
   return (
     <Sider
       width={collapsed ? 72 : 240}
-      className={`${styles.sider}${
-        collapsed ? ` ${styles.siderCollapsed}` : ""
-      }${isDark ? ` ${styles.siderDark}` : ""}`}
+      className={`${styles.sider}${collapsed ? ` ${styles.siderCollapsed}` : ""
+        }${isDark ? ` ${styles.siderDark}` : ""}`}
     >
       <div className={styles.agentSelectorContainer}>
         <AgentSelector collapsed={collapsed} />
@@ -324,9 +288,8 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
                 }}
               >
                 <button
-                  className={`${styles.collapsedNavItem} ${
-                    isActive ? styles.collapsedNavItemActive : ""
-                  }`}
+                  className={`${styles.collapsedNavItem} ${isActive ? styles.collapsedNavItemActive : ""
+                    }`}
                   onClick={() => navigate(item.path)}
                 >
                   {item.icon}
@@ -360,9 +323,8 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
               setAccountModalOpen(true);
             }}
             block
-            className={`${styles.authBtn} ${
-              collapsed ? styles.authBtnCollapsed : ""
-            }`}
+            className={`${styles.authBtn} ${collapsed ? styles.authBtnCollapsed : ""
+              }`}
           >
             {!collapsed && t("account.title")}
           </Button>
@@ -374,9 +336,8 @@ export default function Sidebar({ selectedKey }: SidebarProps) {
               window.location.href = "/login";
             }}
             block
-            className={`${styles.authBtn} ${
-              collapsed ? styles.authBtnCollapsed : ""
-            }`}
+            className={`${styles.authBtn} ${collapsed ? styles.authBtnCollapsed : ""
+              }`}
           >
             {!collapsed && t("login.logout")}
           </Button>
