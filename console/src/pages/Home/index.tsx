@@ -271,71 +271,71 @@ export default function HomePage() {
                         isDisabled ? styles.agentCardDisabled : ""
                       }`}
                     >
-                  <div className={styles.cardHeader}>
-                    <div className={styles.avatarBadge}>
-                      {normalizeAgentAvatar(avatars[agent.id])}
-                    </div>
-                    {isDisabled && (
-                      <span className={styles.statusChip}>
-                        {t("agent.disabled")}
-                      </span>
-                    )}
-                  </div>
+                      <div className={styles.cardHeader}>
+                        <div className={styles.avatarBadge}>
+                          {normalizeAgentAvatar(avatars[agent.id])}
+                        </div>
+                        {isDisabled && (
+                          <span className={styles.statusChip}>
+                            {t("agent.disabled")}
+                          </span>
+                        )}
+                      </div>
 
-                  <div className={styles.metaBlock}>
-                    <Text className={styles.metaLabel}>{t("agent.id")}</Text>
-                    <Text className={styles.agentId}>{agent.id}</Text>
-                  </div>
+                      <div className={styles.metaBlock}>
+                        <Text className={styles.metaLabel}>{t("agent.id")}</Text>
+                        <Text className={styles.agentId}>{agent.id}</Text>
+                      </div>
 
-                  <div className={styles.contentBlock}>
-                    <Title level={4} className={styles.agentName}>
-                      {getAgentDisplayName(agent, t)}
-                    </Title>
-                    <Paragraph className={styles.agentDescription}>
-                      {agent.description?.trim() || "-"}
-                    </Paragraph>
-                  </div>
+                      <div className={styles.contentBlock}>
+                        <Title level={4} className={styles.agentName}>
+                          {getAgentDisplayName(agent, t)}
+                        </Title>
+                        <Paragraph className={styles.agentDescription}>
+                          {agent.description?.trim() || "-"}
+                        </Paragraph>
+                      </div>
 
-                  <div className={styles.actions}>
-                    <Button
-                      type="primary"
-                      block
-                      icon={<PlayCircleOutlined />}
-                      onClick={() => handleStart(agent)}
-                      disabled={isDisabled}
-                    >
-                      {t("agent.start")}
-                    </Button>
-
-                    <div className={styles.actionRow}>
-                      <Button
-                        block
-                        icon={<EditOutlined />}
-                        onClick={() => handleEdit(agent)}
-                        disabled={isDefaultAgent}
-                      >
-                        {t("common.edit")}
-                      </Button>
-
-                      <Popconfirm
-                        title={t("agent.deleteConfirm")}
-                        description={t("agent.deleteConfirmDesc")}
-                        onConfirm={() => handleDelete(agent.id)}
-                        disabled={isDefaultAgent}
-                        okText={t("common.confirm")}
-                        cancelText={t("common.cancel")}
-                      >
+                      <div className={styles.actions}>
                         <Button
+                          type="primary"
                           block
-                          danger
-                          icon={<DeleteOutlined />}
-                          disabled={isDefaultAgent}
+                          icon={<PlayCircleOutlined />}
+                          onClick={() => handleStart(agent)}
+                          disabled={isDisabled}
                         >
-                          {t("common.delete")}
+                          {t("agent.start")}
                         </Button>
-                      </Popconfirm>
-                    </div>
-                  </div>
+
+                        <div className={styles.actionRow}>
+                          <Button
+                            block
+                            icon={<EditOutlined />}
+                            onClick={() => handleEdit(agent)}
+                            disabled={isDefaultAgent}
+                          >
+                            {t("common.edit")}
+                          </Button>
+
+                          <Popconfirm
+                            title={t("agent.deleteConfirm")}
+                            description={t("agent.deleteConfirmDesc")}
+                            onConfirm={() => handleDelete(agent.id)}
+                            disabled={isDefaultAgent}
+                            okText={t("common.confirm")}
+                            cancelText={t("common.cancel")}
+                          >
+                            <Button
+                              block
+                              danger
+                              icon={<DeleteOutlined />}
+                              disabled={isDefaultAgent}
+                            >
+                              {t("common.delete")}
+                            </Button>
+                          </Popconfirm>
+                        </div>
+                      </div>
                     </SortableAgentCard>
                   );
                 })}
