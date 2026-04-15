@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Modal,
   Form,
@@ -51,6 +51,11 @@ export function AgentModal({
   const [installedSkills, setInstalledSkills] = useState<string[]>([]);
   const [loadingSkills, setLoadingSkills] = useState(false);
 
+  const onInstalledSkillsLoadedRef = useRef(onInstalledSkillsLoaded);
+  onInstalledSkillsLoadedRef.current = onInstalledSkillsLoaded;
+  const onSelectedSkillsChangeRef = useRef(onSelectedSkillsChange);
+  onSelectedSkillsChangeRef.current = onSelectedSkillsChange;
+
   useEffect(() => {
     if (!open) return;
     setLoadingSkills(true);
@@ -69,15 +74,15 @@ export function AgentModal({
 
         setPoolSkills(pool);
         setInstalledSkills(installedSkills);
-        onInstalledSkillsLoaded(installedSkills);
+        onInstalledSkillsLoadedRef.current(installedSkills);
         if (editingAgent) {
-          onSelectedSkillsChange(installedSkills);
+          onSelectedSkillsChangeRef.current(installedSkills);
         } else {
-          onSelectedSkillsChange([]);
+          onSelectedSkillsChangeRef.current([]);
         }
       })
       .finally(() => setLoadingSkills(false));
-  }, [editingAgent, onInstalledSkillsLoaded, onSelectedSkillsChange, open]);
+  }, [editingAgent, open]);
 
   const toggleSkill = (name: string) => {
     const isInstalled = editingAgent && installedSkills.includes(name);
@@ -178,7 +183,7 @@ export function AgentModal({
         <Form.Item
           name="workspace_dir"
           label={t("agent.workspace")}
-          help={!editingAgent ? t("agent.workspaceHelp") : undefined}
+          extra={!editingAgent ? <span className={styles.workspaceHint}>{t("agent.workspaceHelp")}</span> : undefined}
         >
           <Input
             placeholder="~/.qwenpaw/workspaces/my-agent"
@@ -188,27 +193,20 @@ export function AgentModal({
       </Form>
 
       <div style={{ marginTop: 4 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 8,
-          }}
-        >
-          <Text type="secondary" style={{ fontSize: 13 }}>
+        <div className={styles.skillSectionHeader}>
+          <Text className={styles.skillSectionLabel}>
             {editingAgent
               ? t("agent.addSkillsToAgent")
               : t("agent.initialSkills")}
           </Text>
           <Space size={4}>
-            <Button size="small" type="text" onClick={handleSelectAll}>
+            <Button size="small" type="link" className={styles.skillActionBtn} onClick={handleSelectAll}>
               {t("agent.selectAll")}
             </Button>
-            <Button size="small" type="text" onClick={handleSelectBuiltin}>
+            <Button size="small" type="link" className={styles.skillActionBtn} onClick={handleSelectBuiltin}>
               {t("agent.selectBuiltin")}
             </Button>
-            <Button size="small" type="text" onClick={handleSelectNone}>
+            <Button size="small" type="link" className={styles.skillActionBtn} onClick={handleSelectNone}>
               {t("agent.selectNone")}
             </Button>
           </Space>

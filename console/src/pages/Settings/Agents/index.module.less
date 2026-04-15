@@ -196,6 +196,36 @@
   background: rgba(255, 127, 22, 0.1);
 }
 
+/* ─── Workspace hint ───────────────────────────────────────────────────────── */
+.workspaceHint {
+  color: rgba(26, 23, 22, 0.45);
+  font-size: 12px;
+}
+
+/* ─── Skill section header ─────────────────────────────────────────────────── */
+.skillSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.skillSectionLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(26, 23, 22, 0.65);
+}
+
+.skillActionBtn {
+  color: #a64b00 !important;
+  font-size: 12px !important;
+  padding: 0 4px !important;
+
+  &:hover {
+    color: #ff7f16 !important;
+  }
+}
+
 /* ─── Skill Picker (agent create/edit modal) ───────────────────────────────── */
 .pickerGrid {
   display: grid;
@@ -215,13 +245,13 @@
   transition: all 0.15s ease;
 
   &:hover {
-    border-color: #615ced;
-    background: rgba(97, 92, 237, 0.02);
+    border-color: rgba(255, 127, 22, 0.5);
+    background: rgba(255, 127, 22, 0.03);
   }
 
   &.pickerCardSelected {
-    border-color: #615ced;
-    background: rgba(97, 92, 237, 0.06);
+    border-color: #ff7f16;
+    background: rgba(255, 127, 22, 0.06);
   }
 
   &.pickerCardDisabled {
@@ -237,7 +267,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #615ced;
+  background: #ff7f16;
   color: #fff;
   display: flex;
   align-items: center;
@@ -248,7 +278,7 @@
 .pickerCardTitle {
   font-size: 13px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1a1716;
   word-break: break-all;
 }
 
@@ -312,15 +342,33 @@
     background: rgba(255, 127, 22, 0.16);
   }
 
+  .workspaceHint {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .skillSectionLabel {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .skillActionBtn {
+    color: #ffb36d !important;
+
+    &:hover {
+      color: #ff7f16 !important;
+    }
+  }
+
   .pickerCard {
     border-color: rgba(255, 255, 255, 0.12);
 
     &:hover {
-      background: rgba(97, 92, 237, 0.08);
+      border-color: rgba(255, 127, 22, 0.45);
+      background: rgba(255, 127, 22, 0.08);
     }
 
     &.pickerCardSelected {
-      background: rgba(97, 92, 237, 0.12);
+      border-color: rgba(255, 127, 22, 0.6);
+      background: rgba(255, 127, 22, 0.12);
     }
   }
 
