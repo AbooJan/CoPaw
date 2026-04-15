@@ -784,6 +784,7 @@
     "manageModelsTitle": "{{provider}} — Model Management",
     "userAdded": "User-added",
     "addModel": "Add Model",
+    "autoDiscoverModels": "Auto Discover Models",
     "addModelTitle": "Add Model to {{provider}}",
     "modelIdLabel": "Model ID",
     "modelIdPlaceholder": "e.g. gpt-4o, gemini-2.0-flash",
@@ -793,6 +794,9 @@
     "modelNamePlaceholder": "e.g. GPT-4o, Gemini 2.0 Flash",
     "modelAdded": "Model \"{{name}}\" added",
     "modelAddFailed": "Failed to add model",
+    "autoDiscoverModelsSuccess": "Auto discovery complete. Added {{count}} models",
+    "autoDiscoverModelsNoNew": "Auto discovery complete. No new models were added",
+    "autoDiscoverModelsFailed": "Failed to auto discover models",
     "removeModel": "Remove",
     "removeModelConfirm": "Remove model \"{{name}}\" from {{provider}}?",
     "modelRemoved": "Model \"{{name}}\" removed",
@@ -1071,6 +1075,9 @@
     "memorySummaryTitle": "Long-term Memory Config",
     "memorySummaryEnabled": "Activate Memory Summary",
     "memorySummaryEnabledTooltip": "Automatically generate and save memory summaries during context compaction",
+    "dreamCron": "Dream",
+    "dreamCronTooltip": "Cron expression for periodically optimizing long-term memories through dream state (leave empty to disable)",
+    "dreamCronPlaceholder": "0 23 * * *",
     "forceMemorySearch": "Force Memory Search (beta)",
     "forceMemorySearchTooltip": "Force memory search to run on every conversation turn. Each query will retrieve relevant memories, helping QwenPaw understand you better — but this increases token consumption. Note: enabling force memory search will break the KV cache, reducing cache hit rate. Use with caution.",
     "forceMaxResults": "Force Search Max Results",
@@ -1217,7 +1224,8 @@
       "noResults": "No results found",
       "resultsCount": "Found {{count}} result(s)",
       "userMessage": "User",
-      "assistantMessage": "Assistant"
+      "assistantMessage": "Assistant",
+      "titleMatch": "Title"
     }
   },
   "security": {
